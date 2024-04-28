@@ -5,7 +5,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri =
-  "mongodb+srv://sadatriyad18:GCojT0dHl2a2Rbyg@cluster0.efrqq6z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.efrqq6z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -38,17 +38,23 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
 
+    // Get all the data from the collection
     app.get("/PaintingAndDrawing", async (req, res) => {
       const data = collection.find();
       const userData = await data.toArray();
       res.send(userData);
     });
 
+    // Add data to the collection
     app.post("/AddPaintingAndDrawing", async (req, res) => {
       const data = req.body;
       const result = await collection.insertOne(data);
       res.send(result);
     });
+
+
+
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
