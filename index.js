@@ -3,7 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.efrqq6z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -35,12 +35,21 @@ app.get("/", (req, res) => {
 });
 
 async function run() {
-  const ArtistryCollection = client.db("BB-ArtistryDB").collection("PaintingAndDrawing");
+  const ArtistryCollection = client
+    .db("BB-ArtistryDB")
+    .collection("PaintingAndDrawing");
   try {
     // Get all the data from the collection
     app.get("/PaintingAndDrawing", async (req, res) => {
       const data = ArtistryCollection.find();
       const result = await data.toArray();
+      res.send(result);
+    });
+    // get data by id
+    app.get("/PaintingAndDrawing/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await ArtistryCollection.findOne(query);
       res.send(result);
     });
 
