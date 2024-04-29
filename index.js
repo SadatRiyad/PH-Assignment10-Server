@@ -52,6 +52,22 @@ async function run() {
       const result = await ArtistryCollection.findOne(query);
       res.send(result);
     });
+    // get data by subcategory_Name
+    app.get("/PaintingAndDrawing/subcategory/:subcategory_Name", async (req, res) => {
+      const subcategory_Name = req.params.subcategory_Name;
+      const query = { subcategory_Name: subcategory_Name };
+      const cursor = ArtistryCollection.find(query);
+      const results = await cursor.toArray();
+      res.send(results);
+    });
+    // get data by userEmail
+    app.get("/PaintingAndDrawing/myArtList/:userEmail", async (req, res) => {
+      const userEmail = req.params.userEmail;
+      const query = { userEmail: userEmail };
+      const cursor = ArtistryCollection.find(query);
+      const results = await cursor.toArray();
+      res.send(results);
+    });
 
     // Add data to the collection
     app.post("/PaintingAndDrawing", async (req, res) => {
