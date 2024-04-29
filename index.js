@@ -52,14 +52,51 @@ async function run() {
       const result = await ArtistryCollection.findOne(query);
       res.send(result);
     });
-    // get data by subcategory_Name
-    app.get("/PaintingAndDrawing/subcategory/:subcategory_Name", async (req, res) => {
-      const subcategory_Name = req.params.subcategory_Name;
-      const query = { subcategory_Name: subcategory_Name };
-      const cursor = ArtistryCollection.find(query);
-      const results = await cursor.toArray();
-      res.send(results);
+    // update data by id
+    app.put("/PaintingAndDrawing/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedData = req.body;
+      const data = {
+        $set: {
+          customization: updatedData.customization,
+          image: updatedData.image,
+          item_name: updatedData.item_name,
+          price: updatedData.price,
+          processing_time: updatedData.processing_time,
+          rating: updatedData.rating,
+          short_description: updatedData.short_description,
+          stockStatus: updatedData.stockStatus,
+          subcategory_Name: updatedData.subcategory_Name,
+        },
+      };
+      const result = await ArtistryCollection.updateOne(filter, data);
+      res.send(result);
     });
+    // delete data by id
+    app.delete("/PaintingAndDrawing/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await ArtistryCollection.deleteOne(query);
+      if (!result.deletedCount) {
+        return res.status(404).send("Data not found");
+      } else {
+        res.send(`Deleted ${result.deletedCount} item`);
+      }
+    });
+
+    // get data by subcategory_Name
+    app.get(
+      "/PaintingAndDrawing/subcategory/:subcategory_Name",
+      async (req, res) => {
+        const subcategory_Name = req.params.subcategory_Name;
+        const query = { subcategory_Name: subcategory_Name };
+        const cursor = ArtistryCollection.find(query);
+        const results = await cursor.toArray();
+        res.send(results);
+      }
+    );
     // get data by userEmail
     app.get("/PaintingAndDrawing/myArtList/:userEmail", async (req, res) => {
       const userEmail = req.params.userEmail;
