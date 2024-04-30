@@ -79,11 +79,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await ArtistryCollection.deleteOne(query);
-      if (!result.deletedCount) {
-        return res.status(404).send("Data not found");
-      } else {
-        res.send(`Deleted ${result.deletedCount} item`);
-      }
+      res.send(result);
     });
 
     // get data by subcategory_Name
@@ -97,14 +93,21 @@ async function run() {
         res.send(results);
       }
     );
-    // get data by userEmail
     app.get("/PaintingAndDrawing/myArtList/:userEmail", async (req, res) => {
-      const userEmail = req.params.userEmail;
-      const query = { userEmail: userEmail };
-      const cursor = ArtistryCollection.find(query);
-      const results = await cursor.toArray();
-      res.send(results);
-    });
+        const userEmail = req.params.userEmail;
+        const sortBy = req.query.sortBy || "price"; // Default sort by price if sortBy parameter is not provided
+      
+        try {
+          const query = { userEmail: userEmail };
+          const cursor = ArtistryCollection.find(query).sort({ [sortBy]: 1 }); // Sorting by the specified field
+          const results = await cursor.toArray();
+          res.send(results);
+        } catch (error) {
+          console.error("Error fetching art and craft items:", error);
+          res.status(500).json({ error: "Internal Server Error" });
+        }
+      });
+      
 
     // Add data to the collection
     app.post("/PaintingAndDrawing", async (req, res) => {
